@@ -1,10 +1,10 @@
 _base_ = '../default.py'
 
-expname = ''
-basedir = 'path to store exp'
+expname = 'exp_example'
+basedir = '/itet-stor/azhuavlev/net_scratch/Projects/Results/DeVRF/'
 
 data = dict(
-    datadir='path to dataset',
+    datadir='/itet-stor/azhuavlev/net_scratch/Projects/Data/DeVRF/lego/static/',
     dataset_type='blender',
     white_bkgd=True,
 )

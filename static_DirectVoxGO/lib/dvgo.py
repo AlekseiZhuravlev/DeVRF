@@ -322,6 +322,10 @@ class DirectVoxGO(torch.nn.Module):
             density = density[mask]
             alpha = alpha[mask]
 
+        # print('Alphas2Weights.apply(alpha, ray_id, N)')
+        # print(Alphas2Weights.apply(alpha, ray_id, N))
+        # exit(0)
+
         # compute accumulated transmittance
         weights, alphainv_last = Alphas2Weights.apply(alpha, ray_id, N)
         if self.fast_color_thres > 0:
@@ -356,13 +360,43 @@ class DirectVoxGO(torch.nn.Module):
             else:
                 rgb = torch.sigmoid(rgb_logit + k0_diffuse)
 
+        # # TODO fix dimensions
         # Ray marching
         rgb_marched = segment_coo(
                 src=(weights.unsqueeze(-1) * rgb),
                 index=ray_id,
-                out=torch.zeros([N, 3]),
+                # out=torch.zeros([N, 3]),
                 reduce='sum')
-        rgb_marched += (alphainv_last.unsqueeze(-1) * render_kwargs['bg'])
+
+        # print('render_kwargs:', render_kwargs)
+
+        # print('alphainv_last:', alphainv_last)
+
+
+
+        # print('rgb_marched:', rgb_marched)
+        #
+        # exit(0)
+
+        addition = (alphainv_last.unsqueeze(-1) * render_kwargs['bg'])
+
+        if addition.size()[0] != rgb_marched.size()[0]:
+            rgb_marched = F.pad(rgb_marched, (0, 0, 0, addition.size()[0] - rgb_marched.size()[0]), "constant", 0)
+
+        rgb_marched += addition
+
+        # try:
+        #     rgb_marched += (alphainv_last.unsqueeze(-1) * render_kwargs['bg'])
+        # except Exception:
+        #     print('Exception')
+        #     print('eights.unsqueeze(-1) * rgb', (weights.unsqueeze(-1) * rgb).size())
+        #     print('ray_id', ray_id.size())
+        #     print('rgb_marched', rgb_marched.size())
+        #     print('alphainv_last.unsqueeze(-1)', (alphainv_last.unsqueeze(-1)).size())
+        #     print("render_kwargs['bg']", render_kwargs['bg'])
+
+            # raise
+
         ret_dict.update({
             'alphainv_last': alphainv_last,
             'weights': weights,

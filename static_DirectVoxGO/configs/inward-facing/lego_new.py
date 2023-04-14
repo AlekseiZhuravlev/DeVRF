@@ -1,13 +1,16 @@
 from copy import deepcopy
 
-expname = 'start'                    # experiment name
-basedir = './logs/'               # where to store ckpts and logs
+_base_ = '../default.py'
+
+expname = 'exp_example'
+basedir = '/itet-stor/azhuavlev/net_scratch/Projects/Results/DeVRF/'
+
 
 ''' Template of data options
 '''
 data = dict(
-    datadir=None,                 # path to dataset root folder
-    dataset_type=None,            # blender | nsvf | blendedmvs | tankstemple | deepvoxels | co3d
+    datadir='/itet-stor/azhuavlev/net_scratch/Projects/Data/DeVRF/lego/static/',  # path to dataset root folder
+    dataset_type='blender',            # blender | nsvf | blendedmvs | tankstemple | deepvoxels | co3d
     inverse_y=False,              # intrinsict mode (to support blendedmvs, nsvf, tankstemple)
     flip_x=False,                 # to support co3d
     flip_y=False,                 # to support co3d
@@ -16,7 +19,7 @@ data = dict(
     sequence_name='',             # to support co3d
     load2gpu_on_the_fly=False,    # do not load all images into gpu (to save gpu memory)
     testskip=1,                   # subsample testset to preview results
-    white_bkgd=False,             # use white background (note that some dataset don't provide alpha and with blended bg color)
+    white_bkgd=True,             # use white background (note that some dataset don't provide alpha and with blended bg color)
     half_res=True,               # [TODO]
 
     # Below are forward-facing llff specific settings. Not support yet.
